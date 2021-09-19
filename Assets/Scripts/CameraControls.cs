@@ -21,14 +21,22 @@ public class CameraControls : MonoBehaviour
 
     private void Start()
     {
-        _startingCameraPos = camera.transform.position;
+        _startingCameraPos = camera.transform.localPosition;
+        PlayerController.OnFire.AddListener(OnFire);
+        PlayerController.OnBulletReset.AddListener(OnBulletReset);
     }
 
     public void OnPointerMove(CallbackContext ctx)
     {
         _pointerPos = camera.ScreenToWorldPoint(ctx.ReadValue<Vector2>());
-        if (_clicking && _canDrag)
-            camera.transform.position = _originalCameraPos - (_pointerPos - _originalPointerPos) * scrollSpeed;
+        _pointerPos = camera.transform.TransformVector(_pointerPos);
+        if (_clicking && _canDrag && !Crosshair.draggingCrosshair)
+        {
+            camera.transform.localPosition = _originalCameraPos - (_pointerPos - _originalPointerPos) * scrollSpeed;
+            var pos = camera.transform.localPosition;
+            pos.z = -2.0f;
+            camera.transform.localPosition = pos;
+        }
     }
     public void OnClick(CallbackContext ctx)
     {
@@ -36,7 +44,7 @@ public class CameraControls : MonoBehaviour
         if (_clicking && _originalPointerPos == Vector2.zero)
         {
             _originalPointerPos = _pointerPos;
-            _originalCameraPos = camera.transform.position;
+            _originalCameraPos = camera.transform.localPosition;
         }
         else if (ctx.canceled)
         {
@@ -51,14 +59,20 @@ public class CameraControls : MonoBehaviour
         IEnumerator Lerp(bool toOrigin)
         {
             float x = 0.0f;
-            var originalPos = camera.transform.position;
+            Vector2 originalPos = camera.transform.localPosition;
             var lerpTo = toOrigin ? Vector2.zero : _startingCameraPos;
+            Debug.Log(lerpTo);
             while (x < 1.0f)
             {
                 yield return new WaitForEndOfFrame();
                 x += Time.deltaTime;
-                camera.transform.position = Vector2.Lerp(originalPos, lerpTo, cameraScrollCurve.Evaluate(x));
+                var temp = Vector2.Lerp(originalPos, lerpTo, cameraScrollCurve.Evaluate(x));
+                Vector3 pos = temp;
+                pos.z = -2.0f;
+                camera.transform.localPosition = pos;
             }
+            //camera.transform.localPosition = camera.transform.localPosition - new Vector3(0.0f, 0.0f, camera.transform.localPosition.z);
+            //camera.transform.localPosition += new Vector3(0.0f, 0.0f, -2.0f);
         }
         StartCoroutine(Lerp(lerpToOrigin));
     }
