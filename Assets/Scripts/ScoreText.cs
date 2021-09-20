@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class ScoreText : MonoBehaviour
 {
+    [SerializeField] bool getHighScore = false;
     [Header("References")]
     [SerializeField] TMPro.TextMeshProUGUI text;
     // Update is called once per frame
     void Update()
     {
-        text.text = ScoreManager.GetScore().ToString();
+        if (!getHighScore)
+            text.text = ScoreManager.GetScore().ToString();
+        else
+            text.text = PlayerPrefs.GetFloat("Highscore",0.0f).ToString();
     }
 }

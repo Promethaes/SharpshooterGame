@@ -51,7 +51,7 @@ public class ScoreManager : MonoBehaviour
     void SaveScore()
     {
         float hs = PlayerPrefs.GetFloat("Highscore", -1.0f);
-        if (hs != -1.0f && _score > hs)
+        if (_score > hs)
         {
             PlayerPrefs.SetFloat("Highscore", _score);
             PlayerPrefs.Save();
