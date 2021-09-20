@@ -10,8 +10,8 @@ public class PlayerController : MonoBehaviour
 
 
     [SerializeField] float bulletSpeed = 10.0f;
-    [Range(0.1f, 1.0f)]
-    [SerializeField] float bulletTurnResistance = 0.1f;
+    [Range(1.0f, 10.0f)]
+    [SerializeField] float bulletTurnForceScalar = 0.1f;
     [Tooltip("References")]
     [SerializeField] Rigidbody2D rigidbody = null;
     [SerializeField] Crosshair crosshair = null;
@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform startPoint = null;
 
     bool _hasFired = false;
+    bool _canSteer = false;
 
     Vector2 _pointerPos = Vector2.zero;
     // Start is called before the first frame update
@@ -27,12 +28,14 @@ public class PlayerController : MonoBehaviour
         void FireBullet()
         {
             _hasFired = true;
+            _canSteer = true;
             var direction = (crosshair.transform.position - transform.position).normalized;
-            rigidbody.AddForce(direction * bulletSpeed,ForceMode2D.Impulse);
+            rigidbody.AddForce(direction * bulletSpeed, ForceMode2D.Impulse);
         }
         void BulletDie()
         {
             rigidbody.velocity = Vector3.zero;
+            _canSteer = false;
         }
         void BulletReset()
         {
@@ -43,6 +46,15 @@ public class PlayerController : MonoBehaviour
         OnFire.AddListener(FireBullet);
         BulletTimeManager.OnBulletReset.AddListener(BulletReset);
         BulletTimeManager.OnBulletDie.AddListener(BulletDie);
+    }
+
+    private void FixedUpdate()
+    {
+        if (!_canSteer)
+            return;
+        var direction = _pointerPos - (Vector2)transform.position;
+        direction = direction.normalized;
+        rigidbody.AddForce(direction * bulletTurnForceScalar);
     }
 
     public void OnPointerMove(CallbackContext ctx)

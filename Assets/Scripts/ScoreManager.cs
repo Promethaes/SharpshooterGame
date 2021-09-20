@@ -30,6 +30,8 @@ public class ScoreManager : MonoBehaviour
         void BulletReset()
         {
             StopCoroutine(Tick);
+            SaveScore();
+            _score = 0.0f;
         }
         PlayerController.OnFire.AddListener(Fire);
         BulletTimeManager.OnBulletReset.AddListener(BulletReset);
@@ -54,7 +56,6 @@ public class ScoreManager : MonoBehaviour
             PlayerPrefs.SetFloat("Highscore", _score);
             PlayerPrefs.Save();
         }
-        Debug.Log(_score);
     }
 
     public static float GetScore()

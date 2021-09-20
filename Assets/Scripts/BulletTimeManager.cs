@@ -59,7 +59,7 @@ public class BulletTimeManager : MonoBehaviour
     }
     public static void SubtractBulletTime(float time)
     {
-        _bulletTime -= time;
+        _bulletTime -= Mathf.Abs(time);
         OnSubtractBulletTime.Invoke();
     }
 

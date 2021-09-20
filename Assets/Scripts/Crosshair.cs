@@ -10,6 +10,8 @@ public class Crosshair : MonoBehaviour
     Vector2 _pointerPos = Vector2.zero;
     public static bool draggingCrosshair = false;
 
+    Vector2 _lastShotPosition = Vector2.zero;
+
     private void Start()
     {
         PlayerController.OnFire.AddListener(OnFire);
@@ -36,11 +38,13 @@ public class Crosshair : MonoBehaviour
 
     public void OnFire()
     {
+        _lastShotPosition = transform.localPosition;
         gameObject.SetActive(false);
     }
 
     public void OnBulletReset()
     {
         gameObject.SetActive(true);
+        transform.localPosition = _lastShotPosition;
     }
 }

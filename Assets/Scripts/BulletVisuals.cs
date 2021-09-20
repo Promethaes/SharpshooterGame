@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class BulletVisuals : MonoBehaviour
 {
     [Tooltip("References")]
-    [SerializeField] Slider bulletTimeBar;
-    [SerializeField] Image bulletTimeBarImage;
-    [SerializeField] SpriteRenderer bulletSpriteRenderer;
+    [SerializeField] Slider bulletTimeBar = null;
+    [SerializeField] Image bulletTimeBarImage = null;
+    [SerializeField] SpriteRenderer bulletSpriteRenderer = null;
 
     Coroutine UpdateFill = null;
     private void Start()

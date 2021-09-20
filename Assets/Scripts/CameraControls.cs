@@ -5,10 +5,10 @@ using static UnityEngine.InputSystem.InputAction;
 
 public class CameraControls : MonoBehaviour
 {
-    [SerializeField] AnimationCurve cameraScrollCurve;
+    [SerializeField] AnimationCurve cameraScrollCurve = null;
     [SerializeField] float scrollSpeed = 1.0f;
     [Tooltip("References")]
-    [SerializeField] Camera camera;
+    [SerializeField] Camera camera = null;
 
     Vector2 _startingCameraPos = Vector2.zero;
 

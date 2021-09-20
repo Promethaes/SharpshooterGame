@@ -9,10 +9,19 @@ public class Ricochet : MonoBehaviour
     [SerializeField] float timeValue = 0.0f;
     [SerializeField] UnityEvent RicochetEvent;
 
+    bool _hitCooldown = false;
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Player"))
+        if (!other.CompareTag("Player") || BulletTimeManager.GetBulletTime() < 0.0f || _hitCooldown)
             return;
+        _hitCooldown = true;
+        IEnumerator HitCooldown()
+        {
+            yield return new WaitForSeconds(0.25f);
+            _hitCooldown = false;
+        }
+        StartCoroutine(HitCooldown());
+
         if (timeValue != 0.0f)
         {
             if (timeValue > 0.0f)
@@ -26,15 +35,10 @@ public class Ricochet : MonoBehaviour
         }
 
         //reflect velocity
-        var rigid = other.gameObject.GetComponent<Rigidbody>();
-        var rigidVel = rigid.velocity;
-        var direction = (other.transform.position - transform.position).normalized;
-        if (Mathf.Abs(direction.x) > 0.5f)
-            rigidVel.x = -rigidVel.x;
-        if (Mathf.Abs(direction.y) > 0.5f)
-            rigidVel.y = -rigidVel.y;
+        var rigid = other.gameObject.GetComponent<Rigidbody2D>();
+        var vel = rigid.velocity;
 
-        rigid.velocity = rigidVel;
+        rigid.velocity = -vel;
 
         RicochetEvent.Invoke();
     }
