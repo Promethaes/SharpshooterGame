@@ -7,21 +7,17 @@ using static UnityEngine.InputSystem.InputAction;
 public class PlayerController : MonoBehaviour
 {
     public static UnityEvent OnFire = new UnityEvent();
-    public static UnityEvent OnBulletDie = new UnityEvent();
-    public static UnityEvent OnBulletReset = new UnityEvent();
+
 
     [SerializeField] float bulletSpeed = 10.0f;
     [Range(0.1f, 1.0f)]
-    [SerializeField] float bulletTurnResistance;
-    [SerializeField] float startingBulletTime = 5.0f;
-    [SerializeField] float respawnTime = 1.0f;
+    [SerializeField] float bulletTurnResistance = 0.1f;
     [Tooltip("References")]
-    [SerializeField] Rigidbody rigidbody;
-    [SerializeField] Crosshair crosshair;
-    [SerializeField] Camera camera;
-    [SerializeField] Transform startPoint;
+    [SerializeField] Rigidbody2D rigidbody = null;
+    [SerializeField] Crosshair crosshair = null;
+    [SerializeField] Camera camera = null;
+    [SerializeField] Transform startPoint = null;
 
-    float _bulletTime = 0.0f;
     bool _hasFired = false;
 
     Vector2 _pointerPos = Vector2.zero;
@@ -32,38 +28,21 @@ public class PlayerController : MonoBehaviour
         {
             _hasFired = true;
             var direction = (crosshair.transform.position - transform.position).normalized;
-            Debug.Log(direction*bulletSpeed);
-            rigidbody.AddForce(direction * bulletSpeed, ForceMode.Impulse);
-            _bulletTime = startingBulletTime;
+            rigidbody.AddForce(direction * bulletSpeed,ForceMode2D.Impulse);
+        }
+        void BulletDie()
+        {
+            rigidbody.velocity = Vector3.zero;
         }
         void BulletReset()
         {
             transform.position = startPoint.position;
             _hasFired = false;
-            rigidbody.velocity = Vector3.zero;
         }
 
         OnFire.AddListener(FireBullet);
-        OnBulletReset.AddListener(BulletReset);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (!_hasFired || _bulletTime <= 0.0f)
-            return;
-
-        _bulletTime -= Time.deltaTime;
-        if (_bulletTime <= 0.0f)
-        {
-            OnBulletDie.Invoke();
-            IEnumerator Wait()
-            {
-                yield return new WaitForSeconds(respawnTime);
-                OnBulletReset.Invoke();
-            }
-            StartCoroutine(Wait());
-        }
+        BulletTimeManager.OnBulletReset.AddListener(BulletReset);
+        BulletTimeManager.OnBulletDie.AddListener(BulletDie);
     }
 
     public void OnPointerMove(CallbackContext ctx)

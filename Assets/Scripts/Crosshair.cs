@@ -6,14 +6,14 @@ using static UnityEngine.InputSystem.InputAction;
 public class Crosshair : MonoBehaviour
 {
     [Tooltip("References")]
-    [SerializeField] Camera camera;
+    [SerializeField] Camera camera = null;
     Vector2 _pointerPos = Vector2.zero;
     public static bool draggingCrosshair = false;
 
     private void Start()
     {
         PlayerController.OnFire.AddListener(OnFire);
-        PlayerController.OnBulletReset.AddListener(OnBulletReset);
+        BulletTimeManager.OnBulletReset.AddListener(OnBulletReset);
     }
 
     public void OnPointerMove(CallbackContext ctx)

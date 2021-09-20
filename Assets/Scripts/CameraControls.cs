@@ -10,7 +10,6 @@ public class CameraControls : MonoBehaviour
     [Tooltip("References")]
     [SerializeField] Camera camera;
 
-
     Vector2 _startingCameraPos = Vector2.zero;
 
     bool _canDrag = true;
@@ -23,7 +22,7 @@ public class CameraControls : MonoBehaviour
     {
         _startingCameraPos = camera.transform.localPosition;
         PlayerController.OnFire.AddListener(OnFire);
-        PlayerController.OnBulletReset.AddListener(OnBulletReset);
+        BulletTimeManager.OnBulletReset.AddListener(OnBulletReset);
     }
 
     public void OnPointerMove(CallbackContext ctx)
@@ -61,7 +60,6 @@ public class CameraControls : MonoBehaviour
             float x = 0.0f;
             Vector2 originalPos = camera.transform.localPosition;
             var lerpTo = toOrigin ? Vector2.zero : _startingCameraPos;
-            Debug.Log(lerpTo);
             while (x < 1.0f)
             {
                 yield return new WaitForEndOfFrame();
@@ -71,8 +69,6 @@ public class CameraControls : MonoBehaviour
                 pos.z = -2.0f;
                 camera.transform.localPosition = pos;
             }
-            //camera.transform.localPosition = camera.transform.localPosition - new Vector3(0.0f, 0.0f, camera.transform.localPosition.z);
-            //camera.transform.localPosition += new Vector3(0.0f, 0.0f, -2.0f);
         }
         StartCoroutine(Lerp(lerpToOrigin));
     }
@@ -85,5 +81,6 @@ public class CameraControls : MonoBehaviour
     public void OnBulletReset()
     {
         _canDrag = true;
+        ResetCameraPoisition(false);
     }
 }
