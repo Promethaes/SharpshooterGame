@@ -8,6 +8,7 @@ public class Ricochet : MonoBehaviour
     [SerializeField] float scoreValue = 0.0f;
     [SerializeField] float timeValue = 0.0f;
     [SerializeField] UnityEvent RicochetEvent;
+    
 
     bool _hitCooldown = false;
     private void OnTriggerEnter2D(Collider2D other)
@@ -37,6 +38,12 @@ public class Ricochet : MonoBehaviour
         //reflect velocity
         var rigid = other.gameObject.GetComponent<Rigidbody2D>();
         var vel = rigid.velocity;
+
+        List<Vector3> sides = new List<Vector3>();
+        sides.Add(new Vector3(other.bounds.min.x, other.bounds.min.y));
+        sides.Add(new Vector3(other.bounds.max.x, other.bounds.max.x));
+        sides.Add(new Vector3(other.bounds.min.x, other.bounds.max.y));
+        sides.Add(new Vector3(other.bounds.max.x, other.bounds.min.y));
 
         rigid.velocity = -vel;
 
