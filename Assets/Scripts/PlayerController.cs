@@ -54,6 +54,9 @@ public class PlayerController : MonoBehaviour
             return;
         var direction = _pointerPos - (Vector2)transform.position;
         direction = direction.normalized;
+        var vel = rigidbody.velocity;
+        vel = Vector3.RotateTowards(vel,direction,Time.deltaTime*bulletTurnForceScalar,0.0f);
+        rigidbody.velocity = vel;
         //rigidbody.AddForce(direction * bulletTurnForceScalar);
     }
 
