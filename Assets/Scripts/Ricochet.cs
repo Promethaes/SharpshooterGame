@@ -11,9 +11,9 @@ public class Ricochet : MonoBehaviour
 
 
     bool _hitCooldown = false;
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
-        if (!other.CompareTag("Player") || BulletTimeManager.GetBulletTime() < 0.0f || _hitCooldown)
+        if (!other.gameObject.CompareTag("Player") || BulletTimeManager.GetBulletTime() < 0.0f || _hitCooldown)
             return;
         _hitCooldown = true;
         IEnumerator HitCooldown()
@@ -34,18 +34,6 @@ public class Ricochet : MonoBehaviour
         {
             ScoreManager.AddScore(scoreValue);
         }
-
-        //reflect velocity
-        var rigid = other.gameObject.GetComponent<Rigidbody2D>();
-        var vel = rigid.velocity;
-
-        List<Vector3> sides = new List<Vector3>();
-        sides.Add(new Vector3(other.bounds.min.x, other.bounds.max.y) - other.bounds.min);
-        sides.Add(other.bounds.max - new Vector3(other.bounds.min.x, other.bounds.max.y));
-        sides.Add(new Vector3(other.bounds.max.x, other.bounds.min.y) - other.bounds.max);
-        sides.Add(other.bounds.min - new Vector3(other.bounds.max.x, other.bounds.min.y));
-
-        rigid.velocity = -vel;
 
         RicochetEvent.Invoke();
     }

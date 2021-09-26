@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
             return;
         var direction = _pointerPos - (Vector2)transform.position;
         direction = direction.normalized;
-        rigidbody.AddForce(direction * bulletTurnForceScalar);
+        //rigidbody.AddForce(direction * bulletTurnForceScalar);
     }
 
     public void OnPointerMove(CallbackContext ctx)
