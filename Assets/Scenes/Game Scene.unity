@@ -6948,7 +6948,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfbd34f171efc5e41885578cc2a5df2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraScrollCurve:
+  cameraMovementAndZoomCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -6973,6 +6973,10 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   scrollSpeed: 10
+  cameraZoomLowerBound: 5
+  cameraZoomUpperBound: 15
+  zoomSpeed: 2
+  zoomTime: 0.1
   camera: {fileID: 901803117}
 --- !u!114 &1095005696
 MonoBehaviour:
@@ -7063,6 +7067,21 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: cc1953da-1d76-40e6-9286-884695722fb5
     m_ActionName: InGame/Click[/Mouse/leftButton,/Touchscreen/primaryTouch/tap]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1095005695}
+        m_MethodName: OnZoom
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 7c20ee11-b815-49ab-9b1e-35a0df7d0726
+    m_ActionName: InGame/Zoom[/Mouse/scroll/y,/Mouse/scroll/y]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: InGame
@@ -7078,7 +7097,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -7106,8 +7125,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1f4e7e3d51e6ff42b57639bce5b0da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 6
-  bulletTurnForceScalar: 3.51
+  bulletSpeed: 12
+  bulletTurnForceScalar: 1.52
   rigidbody: {fileID: 1095005701}
   crosshair: {fileID: 1534517397}
   camera: {fileID: 901803117}
@@ -7124,7 +7143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b555d903a32a2c04e9f6916200cd825c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingBulletTime: 10
+  startingBulletTime: 15
   respawnTime: 1
 --- !u!114 &1095005700
 MonoBehaviour:
@@ -7141,6 +7160,7 @@ MonoBehaviour:
   bulletTimeBar: {fileID: 923185373}
   bulletTimeBarImage: {fileID: 1580314602}
   bulletSpriteRenderer: {fileID: 1095005694}
+  bulletTrail: {fileID: 525133255}
 --- !u!50 &1095005701
 Rigidbody2D:
   serializedVersion: 4
@@ -7157,11 +7177,11 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 0
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 83d6ed3f8cee707418fa8d03b0082941, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &1095005702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7174,7 +7194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ea870ef35de9224493da4c60615c57a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scorePerSecond: 1
+  scorePerSecond: 10
   scoreTickRate: 1
 --- !u!1001 &1126604226
 PrefabInstance:
@@ -10023,6 +10043,7 @@ GameObject:
   - component: {fileID: 1534517399}
   - component: {fileID: 1534517398}
   - component: {fileID: 1534517397}
+  - component: {fileID: 1534517400}
   m_Layer: 0
   m_Name: Crosshair
   m_TagString: Crosshair
@@ -10133,6 +10154,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1534517400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534517395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0e2d20bbde0d8a498963b0fb7ab53fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lerpCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1.9571644
+      outSlope: 1.9571644
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.5029619
+      value: 0.98437905
+      inSlope: -0.0017552376
+      outSlope: -0.0017552376
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.0062256
+      value: -0.002357483
+      inSlope: -1.9606749
+      outSlope: -1.9606749
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  lerpToScale: {x: 0.25, y: 0.25, z: 0.25}
 --- !u!1001 &1539512638
 PrefabInstance:
   m_ObjectHideFlags: 0

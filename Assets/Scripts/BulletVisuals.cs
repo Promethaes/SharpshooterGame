@@ -9,12 +9,16 @@ public class BulletVisuals : MonoBehaviour
     [SerializeField] Slider bulletTimeBar = null;
     [SerializeField] Image bulletTimeBarImage = null;
     [SerializeField] SpriteRenderer bulletSpriteRenderer = null;
+    [SerializeField] TrailRenderer bulletTrail = null;
 
-    Coroutine UpdateFill = null;
+    Coroutine _updateFillAndTrail = null;
+
+    Color _originalTrailColor = Color.blue;
     private void Start()
     {
         bulletSpriteRenderer.enabled = false;
         bulletTimeBar.gameObject.SetActive(false);
+        _originalTrailColor = bulletTrail.startColor;
         void Die()
         {
             IEnumerator Fade()
@@ -30,7 +34,7 @@ public class BulletVisuals : MonoBehaviour
                 }
             }
             StartCoroutine(Fade());
-            StopCoroutine(UpdateFill);
+            StopCoroutine(_updateFillAndTrail);
         }
         void ResetBullet()
         {
@@ -39,25 +43,36 @@ public class BulletVisuals : MonoBehaviour
             bulletSpriteRenderer.color = col;
             bulletSpriteRenderer.enabled = false;
             bulletTimeBar.gameObject.SetActive(false);
+            bulletTrail.startColor = _originalTrailColor;
 
         }
         void Fire()
         {
 
             bulletSpriteRenderer.enabled = true;
+            var temp = bulletSpriteRenderer.color;
+            temp.a = 1.0f;
+            bulletSpriteRenderer.color = temp;
             bulletTimeBar.gameObject.SetActive(true);
-            IEnumerator Fill()
+            IEnumerator FillAndTrail()
             {
                 while (true)
                 {
                     yield return new WaitForEndOfFrame();
-                    bulletTimeBar.value = BulletTimeManager.GetBulletTime() / BulletTimeManager.GetMaxBulletTime();
-                    bulletTimeBarImage.color = Color.Lerp(Color.red, Color.green, bulletTimeBar.value);
+                    var u = bulletTimeBar.value = BulletTimeManager.GetBulletTime() / BulletTimeManager.GetMaxBulletTime();
+                    bulletTimeBarImage.color = Color.Lerp(Color.red, Color.green, u);
+                    bulletTrail.startColor = Color.Lerp(Color.red, _originalTrailColor, u);
+
                     var col = bulletTimeBarImage.color;
                     col.a = 1.0f;
+                    bulletTimeBarImage.color = col;
+
+                    col = bulletTrail.startColor;
+                    col.a = 1.0f;
+                    bulletTrail.startColor = col;
                 }
             }
-            UpdateFill = StartCoroutine(Fill());
+            _updateFillAndTrail = StartCoroutine(FillAndTrail());
         }
 
 

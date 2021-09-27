@@ -5,8 +5,12 @@ using static UnityEngine.InputSystem.InputAction;
 
 public class CameraControls : MonoBehaviour
 {
-    [SerializeField] AnimationCurve cameraScrollCurve = null;
+    [SerializeField] AnimationCurve cameraMovementAndZoomCurve = null;
     [SerializeField] float scrollSpeed = 1.0f;
+    [SerializeField] float cameraZoomLowerBound = 5.0f;
+    [SerializeField] float cameraZoomUpperBound = 10.0f;
+    [SerializeField] float zoomSpeed = 1.0f;
+    [SerializeField] float zoomTime = 0.25f;
     [Tooltip("References")]
     [SerializeField] Camera camera = null;
 
@@ -18,22 +22,36 @@ public class CameraControls : MonoBehaviour
     Vector2 _originalPointerPos = Vector2.zero;
     Vector2 _originalCameraPos = Vector2.zero;
 
+    float _cameraZoomFactor = 0.0f;
+    int _zoomSign = 0;
+    Coroutine _zoomTimeCoroutine = null;
+
     private void Start()
     {
         _startingCameraPos = camera.transform.localPosition;
         PlayerController.OnFire.AddListener(OnFire);
         BulletTimeManager.OnBulletReset.AddListener(OnBulletReset);
+        _cameraZoomFactor = 1.0f;
+    }
+
+    private void Update()
+    {
+        //scroll
+
+        //zoom
+        _cameraZoomFactor += _zoomSign * zoomSpeed * Time.deltaTime;
+        _cameraZoomFactor = Mathf.Clamp(_cameraZoomFactor, 0.0f, 1.0f);
+        camera.orthographicSize = Mathf.Lerp(cameraZoomLowerBound, cameraZoomUpperBound, cameraMovementAndZoomCurve.Evaluate(_cameraZoomFactor));
     }
 
     public void OnPointerMove(CallbackContext ctx)
     {
         _pointerPos = camera.ScreenToWorldPoint(ctx.ReadValue<Vector2>());
-        _pointerPos = camera.transform.TransformVector(_pointerPos);
         if (_clicking && _canDrag && !Crosshair.draggingCrosshair)
         {
             camera.transform.localPosition = _originalCameraPos - (_pointerPos - _originalPointerPos) * scrollSpeed;
             var pos = camera.transform.localPosition;
-            pos.z = -2.0f;
+            pos.z = -2.0f;//ensure no weird z order bugs
             camera.transform.localPosition = pos;
         }
     }
@@ -53,6 +71,24 @@ public class CameraControls : MonoBehaviour
 
     }
 
+    public void OnZoom(CallbackContext ctx)
+    {
+        var v = ctx.ReadValue<float>();
+        if (v > 0.0f)
+            _zoomSign = 1;
+        else if (v < 0.0f)
+            _zoomSign = -1;
+
+        IEnumerator Wait()
+        {
+            yield return new WaitForSeconds(zoomTime);
+            _zoomSign = 0;
+        }
+        if (_zoomTimeCoroutine != null)
+            StopCoroutine(_zoomTimeCoroutine);
+        _zoomTimeCoroutine = StartCoroutine(Wait());
+    }
+
     public void ResetCameraPoisition(bool lerpToOrigin)
     {
         IEnumerator Lerp(bool toOrigin)
@@ -64,7 +100,7 @@ public class CameraControls : MonoBehaviour
             {
                 yield return new WaitForEndOfFrame();
                 x += Time.deltaTime;
-                var temp = Vector2.Lerp(originalPos, lerpTo, cameraScrollCurve.Evaluate(x));
+                var temp = Vector2.Lerp(originalPos, lerpTo, cameraMovementAndZoomCurve.Evaluate(x));
                 Vector3 pos = temp;
                 pos.z = -2.0f;
                 camera.transform.localPosition = pos;
