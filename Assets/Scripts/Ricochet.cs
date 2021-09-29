@@ -8,6 +8,7 @@ public class Ricochet : MonoBehaviour
     [SerializeField] float scoreValue = 0.0f;
     [SerializeField] float timeValue = 0.0f;
     [SerializeField] UnityEvent RicochetEvent;
+    public static UnityEvent OnAnyRicochet = new UnityEvent();
 
 
     bool _hitCooldown = false;
@@ -36,5 +37,6 @@ public class Ricochet : MonoBehaviour
         }
 
         RicochetEvent.Invoke();
+        OnAnyRicochet.Invoke();
     }
 }

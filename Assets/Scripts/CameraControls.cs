@@ -36,8 +36,6 @@ public class CameraControls : MonoBehaviour
 
     private void Update()
     {
-        //scroll
-
         //zoom
         _cameraZoomFactor += _zoomSign * zoomSpeed * Time.deltaTime;
         _cameraZoomFactor = Mathf.Clamp(_cameraZoomFactor, 0.0f, 1.0f);
